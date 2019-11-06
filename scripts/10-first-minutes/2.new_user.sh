@@ -13,8 +13,8 @@ echo "deploy:$password" | chpasswd
 usermod -aG sudo deploy # add to sudo group
 
 # Copies ssh keys added during creation
-cp /home/admin/.ssh/authorized_keys /home/deploy/.ssh/
-chown deploy:deploy /home/deploy -R 
+cp /home/ubuntu/.ssh/authorized_keys /home/deploy/.ssh/
+chown deploy:deploy /home/deploy -R
 chmod 400 /home/deploy/.ssh/authorized_keys
 
 # Edit ssh config
