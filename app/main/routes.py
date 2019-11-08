@@ -90,6 +90,9 @@ def edit_profile():
 @bp.route('/follow/<username>')
 @login_required
 def follow(username):
+    """
+    Follow a user
+    """
     user = User.query.filter_by(username=username).first()
     if user is None:
         flash('User {} not found.'.format(username))
@@ -105,6 +108,9 @@ def follow(username):
 @bp.route('/unfollow/<username>')
 @login_required
 def unfollow(username):
+    """
+    Unfollow a user
+    """
     user = User.query.filter_by(username=username).first()
     if user is None:
         flash('User {} not found.'.format(username))
