@@ -1,0 +1,22 @@
+version: '2'
+services:
+    microblog:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile_prod
+        environment:
+            - SECRET_KEY=???
+            - DATABASE_URL=mysql+pymysql://microblog:???@sqlserver/microblog
+        ports:
+            - 8000:5000
+        links:
+            - sqlserver
+    sqlserver:
+        image: mysql/mysql-server:latest
+        environment:
+            - MYSQL_RANDOM_ROOT_PASSWORD=yes
+            - MYSQL_DATABASE=microblog
+            - MYSQL_USER=microblog
+            - MYSQL_PASSWORD=???
+        expose:
+            - 3306
