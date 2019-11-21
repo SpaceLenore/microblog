@@ -1,0 +1,15 @@
+FROM python:3.6-alpine
+
+RUN apk --no-cache add libc-dev make
+RUN adduser -D microblog
+
+WORKDIR /home/microblog
+
+COPY . .
+COPY Makefile /home/microblog
+
+RUN apk --update add --virtual build-dependencies libffi-dev openssl-dev python-dev py-pip build-base
+
+RUN ls -l
+RUN make install-test
+CMD ["make", "testing"]

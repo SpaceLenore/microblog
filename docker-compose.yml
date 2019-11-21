@@ -1,6 +1,6 @@
 version: '2'
 services:
-    microblog:
+    prod:
         build:
             context: .
             dockerfile: docker/Dockerfile_prod
@@ -20,3 +20,9 @@ services:
             - MYSQL_PASSWORD=???
         expose:
             - 3306
+    testing:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile_test
+        environment:
+            - SECRET_KEY=???
