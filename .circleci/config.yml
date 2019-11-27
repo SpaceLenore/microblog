@@ -2,54 +2,71 @@
 #
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
-version: 2
+version: 2.1
+executors:
+    docker-publisher:
+        environment:
+            IMAGE_NAME: microblog
+            DH_IMAGE_NAME: microblog
+        docker:
+            - image: circleci/buildpack-deps:stretch
 jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.7
+    test:
+        executor: docker-publisher
+        steps:
+            - checkout
+            - setup_remote_docker
+            - run:
+                name: Run tests with docker
+                command: |
+                    sudo apt-get install python3-venv
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    make testing
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+build:
+    executor: docker-publisher
     steps:
       - checkout
-
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-
+      - setup_remote_docker
       - run:
-          name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            make install-test
-
-      - save_cache:
+          name: Build Docker image production
+          command: docker-compose up --build -d $IMAGE_NAME
+      - run:
+          name: Tag build with latest
+          command: docker tag $DH_IMAGE_NAME:latest spacelenore/microblog:latest
+      - run:
+          name: Archive Docker image
+          command: docker save -o image.tar spacelenore/microblog
+      - persist_to_workspace:
+          root: .
           paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
-      - run:
-          name: run tests
-          command: |
-            . venv/bin/activate
-            make testing
-
-      - store_artifacts:
-          path: test-reports
-          destination: test-reports
+            - ./image.tar
+publish-latest:
+    executor: docker-publisher
+    steps:
+        - attach_workspace:
+            at: /tmp/workspace
+        - setup_remote_docker
+        - run:
+            name: Load archived Docker image
+            command: docker load -i /tmp/workspace/image.tar
+        - run:
+            name: Publish Docker Image to Docker Hub
+            command: |
+                echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+                docker push spacelenore/microblog:latest
+workflows:
+    version: 2
+    build-master:
+        jobs:
+            - build:
+                filters:
+                    tags:
+                        only: /^v.*
+            - publish-tag:
+                requires:
+                    - build
+                filters:
+                    tags:
+                        only: /^v.*/
