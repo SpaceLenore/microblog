@@ -1,6 +1,15 @@
 version: '2'
 services:
     prod:
+        image: ocpu/microblog:latest
+        environment:
+            - SECRET_KEY=???
+            - DATABASE_URL=mysql+pymysql://microblog:???@sqlserver/microblog
+        ports:
+            - 8000:5000
+        links:
+            - sqlserver
+    dev:
         build:
             context: .
             dockerfile: docker/Dockerfile_prod
