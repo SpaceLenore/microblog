@@ -6,8 +6,8 @@ version: 2.1
 executors:
     docker-publisher:
         environment:
-            IMAGE_NAME: microblog
-            DH_IMAGE_NAME: microblog
+            IMAGE_NAME: spacelenore/microblog
+            DH_IMAGE_NAME: spacelenore/microblog
         docker:
             - image: circleci/buildpack-deps:stretch
 jobs:
@@ -67,11 +67,12 @@ workflows:
                         only: master
             - build:
                 filters:
-                    tags:
-                        only: /^v.*
+                    branches:
+                        only: master
             - publish-latest:
                 requires:
                     - build
                 filters:
-                    tags:
-                        only: /^v.*/
+                    filters:
+                        branches:
+                            only: master
