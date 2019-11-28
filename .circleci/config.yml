@@ -35,7 +35,7 @@ jobs:
               command: docker-compose up --build -d $IMAGE_NAME
           - run:
               name: Tag build with latest
-              command: docker tag $IMAGE_NAME:latest $DH_IMAGE_NAME:latest
+              command: docker tag microblog_prod:latest $DH_IMAGE_NAME:latest
           - run:
               name: Archive Docker image
               command: docker save -o image.tar spacelenore/microblog
