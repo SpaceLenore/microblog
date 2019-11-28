@@ -68,7 +68,7 @@ workflows:
                 filters:
                     tags:
                         only: /^v.*
-            - publish-tag:
+            - publish-latest:
                 requires:
                     - build
                 filters:
