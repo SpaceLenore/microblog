@@ -23,11 +23,12 @@ Here is how you setup the development environment and start the application.
 
 Create a virtual environment and install packages:
 ```
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv venv
+source venv/bin/activate
 make install-dev
 ```
 
+If you are on Windows and Cygwin you will probably have troubles installing the pip package `cryptography`. Common errors are missing `python.h`, `gcc`, `cffi` and `openssl`. 
 
 
 ### Database
